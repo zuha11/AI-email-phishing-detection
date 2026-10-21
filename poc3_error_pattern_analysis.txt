@@ -1,0 +1,544 @@
+======================================================================
+POC3 ERROR PATTERN ANALYSIS
+======================================================================
+
+Original rows: 59436
+Cleaned rows: 53210
+Train rows: 42568
+Test rows: 10642
+
+BENCHMARK
+======================================================================
+Accuracy: 99.5208%
+False Positives: 12
+False Negatives: 39
+Total Errors: 51
+
+Confusion Matrix:
+[[5167   12]
+ [  39 5424]]
+
+ERROR PATTERNS ACROSS 51 ERRORS
+======================================================================
+NO_URL                               51
+HAS_SUBJECT                          30
+HAS_SENDER                           29
+HAS_SENDER_DOMAIN                    29
+REQUEST_FOR_INFORMATION              28
+PROMOTIONAL_LANGUAGE                 25
+SHORT_BODY                           24
+LINK_ACTION_LANGUAGE                 24
+NO_SENDER                            22
+NO_SUBJECT                           21
+SCAM_FINANCIAL_LANGUAGE              12
+FINANCIAL_LANGUAGE                   10
+MAILING_LIST_PATTERN                  6
+LONG_BODY                             6
+FREE_EMAIL_DOMAIN                     5
+SECURITY_LANGUAGE                     5
+REPLY_OR_FORWARD                      3
+UPPERCASE_SUBJECT                     3
+URGENCY_LANGUAGE                      3
+
+FALSE-POSITIVE PATTERNS
+======================================================================
+NO_URL                               12
+HAS_SENDER                           11
+HAS_SENDER_DOMAIN                    11
+HAS_SUBJECT                          11
+PROMOTIONAL_LANGUAGE                  9
+LINK_ACTION_LANGUAGE                  8
+REQUEST_FOR_INFORMATION               8
+SCAM_FINANCIAL_LANGUAGE               5
+FINANCIAL_LANGUAGE                    4
+LONG_BODY                             3
+SHORT_BODY                            2
+UPPERCASE_SUBJECT                     2
+SECURITY_LANGUAGE                     2
+MAILING_LIST_PATTERN                  2
+NO_SENDER                             1
+NO_SUBJECT                            1
+
+FALSE-NEGATIVE PATTERNS
+======================================================================
+NO_URL                               39
+SHORT_BODY                           22
+NO_SENDER                            21
+NO_SUBJECT                           20
+REQUEST_FOR_INFORMATION              20
+HAS_SUBJECT                          19
+HAS_SENDER                           18
+HAS_SENDER_DOMAIN                    18
+LINK_ACTION_LANGUAGE                 16
+PROMOTIONAL_LANGUAGE                 16
+SCAM_FINANCIAL_LANGUAGE               7
+FINANCIAL_LANGUAGE                    6
+FREE_EMAIL_DOMAIN                     5
+MAILING_LIST_PATTERN                  4
+REPLY_OR_FORWARD                      3
+LONG_BODY                             3
+SECURITY_LANGUAGE                     3
+URGENCY_LANGUAGE                      3
+UPPERCASE_SUBJECT                     1
+
+ALL ERRORS
+======================================================================
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.197634
+Subject: 
+Sender: 
+Body length: 153
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY, LINK_ACTION_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.116840
+Subject: 
+Sender: 
+Body length: 130
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY, REQUEST_FOR_INFORMATION
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.342232
+Subject: Movie Project
+Sender: Davida <davida@miramax.com>
+Body length: 233
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, SHORT_BODY, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.407073
+Subject: Invitation from aditya monu
+Sender: aditya monu <noreply@en.facebox.com>
+Body length: 1698
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, SCAM_FINANCIAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -1.058547
+Subject: Re: Monkey costumes
+Sender: 
+Body length: 691
+URLs: 0
+Patterns: NO_SENDER, HAS_SUBJECT, NO_URL, REPLY_OR_FORWARD
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.518786
+Subject: hjlxq Online Exclusive! 3-Day Sale Ends Friday
+Sender: user2.1-ext1@gvc.ceas-challenge.cc
+Body length: 584
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.023469
+Subject: Now is the perfect time to visit Costa Rica
+Sender: Costa Rica Vacations <support@theexecutivebargainsdaily.com>
+Body length: 1863
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, LINK_ACTION_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.051219
+Subject: 
+Sender: 
+Body length: 149
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.062436
+Subject: 
+Sender: 
+Body length: 157
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_POSITIVE
+Score: 0.283001
+Subject: italy pics
+Sender: Ben Walsh <xup@dalymount.com>
+Body length: 51
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, SHORT_BODY
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.650799
+Subject: 
+Sender: 
+Body length: 152
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.775944
+Subject: 
+Sender: 
+Body length: 152
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: 0.060855
+Subject: 
+Sender: 
+Body length: 121
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.197316
+Subject: [lwv-healthcare] information source
+Sender: JOannHasse@aol.com
+Body length: 1190
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, FREE_EMAIL_DOMAIN, HAS_SUBJECT, NO_URL, MAILING_LIST_PATTERN, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -1.056221
+Subject: 
+Sender: 
+Body length: 78
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: 0.005709
+Subject: Engineers can't sell !!
+Sender: "Robert Seviour" <robertseviour@totalise.co.uk>
+Body length: 1687
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, FINANCIAL_LANGUAGE, REQUEST_FOR_INFORMATION, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.120268
+Subject: 
+Sender: 
+Body length: 73
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.045433
+Subject: 
+Sender: 
+Body length: 74
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.553207
+Subject: gepzd Online Exclusive! 3-Day Sale Ends Friday
+Sender: user8.3@gvc.ceas-challenge.cc
+Body length: 579
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -1.077140
+Subject: 
+Sender: 
+Body length: 146
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY, REQUEST_FOR_INFORMATION
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.713705
+Subject: user8.2-ext1@gvc.ceas-challenge.cc August Deals Save up to %40 Off
+Sender: user8.2-ext1@gvc.ceas-challenge.cc
+Body length: 855
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE, SCAM_FINANCIAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_POSITIVE
+Score: 0.533228
+Subject: Happy Birthday from Your Voice
+Sender: Your Voice <ojlbwfjhk.gh@nielsen.com>
+Body length: 423
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE, SCAM_FINANCIAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_POSITIVE
+Score: 0.836760
+Subject: Announcing the New Netscape 7.0 - The Fastest Netscape Browser Ever
+Sender: Netscape <Netscape@dms.netscape.com>
+Body length: 2131
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, LONG_BODY, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE, SCAM_FINANCIAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: 0.023626
+Subject: [SA] EM1- Aren't we accorded equal opportunity already?
+Sender: "S. B. Woo" <sbwoo@80-20initiative.net>
+Body length: 4311
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, LONG_BODY, MAILING_LIST_PATTERN, SECURITY_LANGUAGE, FINANCIAL_LANGUAGE, REQUEST_FOR_INFORMATION, PROMOTIONAL_LANGUAGE, SCAM_FINANCIAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.547990
+Subject: how ya been
+Sender: mai <mai_billick@gmail.com>
+Body length: 431
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, FREE_EMAIL_DOMAIN, HAS_SUBJECT, NO_URL, REQUEST_FOR_INFORMATION
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.142283
+Subject: Re: [lwv-healthcare] information source
+Sender: JOannHasse@aol.com
+Body length: 1020
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, FREE_EMAIL_DOMAIN, HAS_SUBJECT, NO_URL, REPLY_OR_FORWARD, MAILING_LIST_PATTERN, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.137428
+Subject: 
+Sender: 
+Body length: 141
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.156001
+Subject: Invite: Content Management Summit, Oct. 10th New York City
+Sender: "Venture Reporter" <news@risingtidestudios.com>
+Body length: 5080
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, LONG_BODY, SECURITY_LANGUAGE, FINANCIAL_LANGUAGE, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE, SCAM_FINANCIAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_POSITIVE
+Score: 0.174874
+Subject: GOVERNMENT REGULATION IS KILLING THE STOCK MARKET
+Sender: "Ayn Rand Institute Media" <davidh@aynrand.org>
+Body length: 2236
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, UPPERCASE_SUBJECT, NO_URL, LONG_BODY, SECURITY_LANGUAGE, FINANCIAL_LANGUAGE, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_POSITIVE
+Score: 0.255866
+Subject: BIG 12 OR BUST
+Sender: "FOXSports FLASH" <FOXSportsFLASH@mailings.foxsports.com>
+Body length: 1294
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, UPPERCASE_SUBJECT, NO_URL, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.228243
+Subject: I thought it was important          YMF
+Sender: "GwendolynMay" <guesshow@philippines.to>
+Body length: 249
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, SHORT_BODY, REQUEST_FOR_INFORMATION
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.922137
+Subject: 
+Sender: 
+Body length: 130
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY, URGENCY_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_POSITIVE
+Score: 0.073014
+Subject: Info from Italy
+Sender: MangEvil <yincoubi@libero.it>
+Body length: 358
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_POSITIVE
+Score: 0.257595
+Subject: [Bookscanada] Query: credit card processing
+Sender: Ainsworth Books <ainsworth@dccnet.com>
+Body length: 1372
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, MAILING_LIST_PATTERN, FINANCIAL_LANGUAGE, PROMOTIONAL_LANGUAGE, SCAM_FINANCIAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: 0.003958
+Subject: 
+Sender: 
+Body length: 72
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.468260
+Subject: 
+Sender: 
+Body length: 73
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY, SECURITY_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.048555
+Subject: hurry
+Sender: "Rob" <yelanotyami912@bot.or.th>
+Body length: 563
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, FINANCIAL_LANGUAGE, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_POSITIVE
+Score: 0.117954
+Subject: Important Information Regarding Your Verizon Wireless Account.
+Sender: "jmxponnibvcst@verizonwireless.com" <mpgleqdivjrnpk@verizonwireless.com>
+Body length: 1645
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, SECURITY_LANGUAGE, FINANCIAL_LANGUAGE, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.096105
+Subject: 
+Sender: 
+Body length: 101
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY
+
+----------------------------------------------------------------------
+Error type: FALSE_POSITIVE
+Score: 0.082053
+Subject: [SQL] Database joins
+Sender: "Jay" <jayps@addr.com>
+Body length: 983
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, MAILING_LIST_PATTERN, REQUEST_FOR_INFORMATION, SCAM_FINANCIAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.300133
+Subject: 
+Sender: 
+Body length: 140
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY, REQUEST_FOR_INFORMATION
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.131908
+Subject: HELP BRING THE OCEANS TO OUR CLASSROOMS
+Sender: zonepost12@mail.ru
+Body length: 2112
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, UPPERCASE_SUBJECT, NO_URL, LONG_BODY, FINANCIAL_LANGUAGE, URGENCY_LANGUAGE, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE, SCAM_FINANCIAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_POSITIVE
+Score: 0.086576
+Subject: 
+Sender: 
+Body length: 158
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.265071
+Subject: Re: [lwv-healthcare] Millions with Chronic illness go untreated - NY Times
+Sender: polirich@aol.com
+Body length: 922
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, FREE_EMAIL_DOMAIN, HAS_SUBJECT, NO_URL, REPLY_OR_FORWARD, MAILING_LIST_PATTERN, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, SCAM_FINANCIAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.590266
+Subject: ignkm Online Exclusive! 3-Day Sale Ends Friday
+Sender: user2.2@gvc.ceas-challenge.cc
+Body length: 579
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_POSITIVE
+Score: 0.335871
+Subject: BurgerFuel Ultimate Taste Challenge
+Sender: BurgerFuel HQ <eptvafh@burgerfuel.co.nz>
+Body length: 1904
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.588746
+Subject: 
+Sender: 
+Body length: 155
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY
+
+----------------------------------------------------------------------
+Error type: FALSE_POSITIVE
+Score: 0.469612
+Subject: A ready-to-submit GSA Schedule proposal in 3 days or less
+Sender: Fedmarket <uiaregi@fedmarket.com>
+Body length: 2727
+URLs: 1
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, HAS_SUBJECT, NO_URL, LONG_BODY, FINANCIAL_LANGUAGE, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE, SCAM_FINANCIAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.216394
+Subject: Blessing People
+Sender: "Tan E.G.Tan E.G." <egtan@yahoo.com>
+Body length: 1339
+URLs: 0
+Patterns: HAS_SENDER, HAS_SENDER_DOMAIN, FREE_EMAIL_DOMAIN, HAS_SUBJECT, NO_URL, FINANCIAL_LANGUAGE, URGENCY_LANGUAGE, REQUEST_FOR_INFORMATION, LINK_ACTION_LANGUAGE, PROMOTIONAL_LANGUAGE, SCAM_FINANCIAL_LANGUAGE
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.192101
+Subject: 
+Sender: 
+Body length: 95
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY
+
+----------------------------------------------------------------------
+Error type: FALSE_NEGATIVE
+Score: -0.645609
+Subject: 
+Sender: 
+Body length: 155
+URLs: 0
+Patterns: NO_SENDER, NO_SUBJECT, NO_URL, SHORT_BODY

@@ -26,3 +26,14 @@ dist-ssr
 __pycache__/
 *.pyc
 *.bak
+
+# Private credentials
+.env
+.env.*
+!.env.example
+
+# Python and ML temporary files
+__pycache__/
+*.pyc
+
+src/pages/live_gmail_poc4_check.json
