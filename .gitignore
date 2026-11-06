@@ -1,0 +1,40 @@
+# Dependencies and build output
+node_modules/
+dist/
+dist-ssr/
+
+# Logs and local files
+logs/
+*.log
+*.local
+.DS_Store
+
+# Editor files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Python cache
+__pycache__/
+*.pyc
+*.bak
+
+# Private credentials and certificates
+.env
+.env.*
+!.env.example
+.flask_session_secret
+localhost+1.pem
+localhost+1-key.pem
+
+# Private databases and email data
+*.sqlite3
+gmail_emails.csv
+poc6_flooding_report.local-backup.json
+
+# Local backups
+*.backup*
+app_before*.py
+app_broken*.py
+app_short_backup.py
+app_code_backup.txt

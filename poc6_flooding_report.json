@@ -1,0 +1,139 @@
+[
+  {
+    "id": "college-1",
+    "sender": "college@example.test",
+    "subject": "Assignment submission date",
+    "timestamp": "2026-10-19T10:00:00",
+    "emails_in_window": 1,
+    "similar_emails_in_window": 1,
+    "risk_score": 0,
+    "risk_level": "LOW",
+    "classification": "NO FLOODING PATTERN DETECTED",
+    "reasons": [
+      "No configured flooding pattern detected"
+    ],
+    "action": "REPORT ONLY - NO EMAIL WAS MOVED"
+  },
+  {
+    "id": "college-2",
+    "sender": "college@example.test",
+    "subject": "Class timetable",
+    "timestamp": "2026-10-19T10:03:00",
+    "emails_in_window": 2,
+    "similar_emails_in_window": 1,
+    "risk_score": 0,
+    "risk_level": "LOW",
+    "classification": "NO FLOODING PATTERN DETECTED",
+    "reasons": [
+      "No configured flooding pattern detected"
+    ],
+    "action": "REPORT ONLY - NO EMAIL WAS MOVED"
+  },
+  {
+    "id": "college-3",
+    "sender": "college@example.test",
+    "subject": "Examination room details",
+    "timestamp": "2026-10-19T10:04:00",
+    "emails_in_window": 3,
+    "similar_emails_in_window": 1,
+    "risk_score": 0,
+    "risk_level": "LOW",
+    "classification": "NO FLOODING PATTERN DETECTED",
+    "reasons": [
+      "No configured flooding pattern detected"
+    ],
+    "action": "REPORT ONLY - NO EMAIL WAS MOVED"
+  },
+  {
+    "id": "promo-1",
+    "sender": "offers@example.test",
+    "subject": "Special offer - limited time",
+    "timestamp": "2026-10-19T10:01:00",
+    "emails_in_window": 1,
+    "similar_emails_in_window": 1,
+    "risk_score": 0,
+    "risk_level": "LOW",
+    "classification": "NO FLOODING PATTERN DETECTED",
+    "reasons": [
+      "No configured flooding pattern detected"
+    ],
+    "action": "REPORT ONLY - NO EMAIL WAS MOVED"
+  },
+  {
+    "id": "promo-2",
+    "sender": "offers@example.test",
+    "subject": "Special offer - limited time",
+    "timestamp": "2026-10-19T10:02:00",
+    "emails_in_window": 2,
+    "similar_emails_in_window": 2,
+    "risk_score": 0,
+    "risk_level": "LOW",
+    "classification": "NO FLOODING PATTERN DETECTED",
+    "reasons": [
+      "No configured flooding pattern detected"
+    ],
+    "action": "REPORT ONLY - NO EMAIL WAS MOVED"
+  },
+  {
+    "id": "promo-3",
+    "sender": "offers@example.test",
+    "subject": "Special offer - limited time",
+    "timestamp": "2026-10-19T10:03:00",
+    "emails_in_window": 3,
+    "similar_emails_in_window": 3,
+    "risk_score": 45,
+    "risk_level": "MEDIUM",
+    "classification": "POSSIBLE FLOODING",
+    "reasons": [
+      "3 emails have similar subjects or message bodies"
+    ],
+    "action": "REPORT ONLY - NO EMAIL WAS MOVED"
+  },
+  {
+    "id": "promo-4",
+    "sender": "offers@example.test",
+    "subject": "Special offer - limited time",
+    "timestamp": "2026-10-19T10:04:00",
+    "emails_in_window": 4,
+    "similar_emails_in_window": 4,
+    "risk_score": 45,
+    "risk_level": "MEDIUM",
+    "classification": "POSSIBLE FLOODING",
+    "reasons": [
+      "4 emails have similar subjects or message bodies"
+    ],
+    "action": "REPORT ONLY - NO EMAIL WAS MOVED"
+  },
+  {
+    "id": "promo-5",
+    "sender": "offers@example.test",
+    "subject": "Special offer - limited time",
+    "timestamp": "2026-10-19T10:05:00",
+    "emails_in_window": 5,
+    "similar_emails_in_window": 5,
+    "risk_score": 100,
+    "risk_level": "HIGH",
+    "classification": "SUSPICIOUS FLOODING",
+    "reasons": [
+      "5 emails from this sender within 10 minutes",
+      "5 emails have similar subjects or message bodies"
+    ],
+    "action": "REPORT ONLY - NO EMAIL WAS MOVED"
+  },
+  {
+    "id": "promo-6",
+    "sender": "offers@example.test",
+    "subject": "Special offer - limited time",
+    "timestamp": "2026-10-19T10:06:00",
+    "emails_in_window": 6,
+    "similar_emails_in_window": 6,
+    "risk_score": 100,
+    "risk_level": "HIGH",
+    "classification": "SUSPICIOUS FLOODING",
+    "reasons": [
+      "6 emails from this sender within 10 minutes",
+      "6 emails have similar subjects or message bodies"
+    ],
+    "action": "REPORT ONLY - NO EMAIL WAS MOVED"
+  }
+]
