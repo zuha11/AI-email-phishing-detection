@@ -1,0 +1,14 @@
+======================================================================
+SMARTMAIL POC 3 - ERROR SUMMARY
+======================================================================
+
+Total Test Emails: 10690
+Total Errors: 31
+False Positives: 9
+False Negatives: 22
+Accuracy: 99.71%
+Decision Threshold: 0.066
+
+Files created:
+False Positives: C:\Users\pc\smartmail-security\src\pages\POC3_false_positives.txt
+False Negatives: C:\Users\pc\smartmail-security\src\pages\POC3_false_negatives.txt
