@@ -1,266 +1,469 @@
-import { useMemo, useState } from "react";
+
+import { useEffect, useMemo, useState } from "react";
 import {
   Search,
-  SlidersHorizontal,
   RefreshCw,
-  MoreVertical,
   Star,
-  ShieldCheck,
-  Ban,
-  AlertTriangle,
   Mail,
   ChevronLeft,
-  ChevronDown,
+  Trash2,
+  Inbox as InboxIcon,
+  FileText,
+  RotateCcw,
+  SlidersHorizontal,
   X,
+  ShieldCheck,
+  ShieldAlert,
+  AlertTriangle,
+  Plus,
+  Send,
+  Save,
+  LoaderCircle,
 } from "lucide-react";
 
-type EmailStatus = "Safe" | "Spam" | "Phishing";
+type SecurityStatus = "Safe" | "Spam" | "Phishing" | "Unclassified";
+type MailFolder = "Inbox" | "Starred" | "Drafts" | "Bin";
+type EmailFilter = "All" | "Spam" | "Phishing" | "Unclassified";
 
-type Email = {
-  id: number;
+export type InboxEmail = {
+  id: string;
   sender: string;
   address: string;
   subject: string;
   preview: string;
   time: string;
-  status: EmailStatus;
-  unread: boolean;
-  starred: boolean;
+  status: SecurityStatus;
+  body?: string;
+  unread?: boolean;
 };
 
-const initialEmails: Email[] = [
-  {
-    id: 1,
-    sender: "Google Security",
-    address: "security@google.com",
-    subject: "Security alert for your account",
-    preview: "We detected a new sign-in to your Google account.",
-    time: "10:32 AM",
-    status: "Safe",
-    unread: true,
-    starred: true,
-  },
-  {
-    id: 2,
-    sender: "Microsoft 365",
-    address: "office@microsoft.com",
-    subject: "Your weekly account summary",
-    preview: "Here is your weekly summary and recent activity.",
-    time: "10:14 AM",
-    status: "Safe",
-    unread: true,
-    starred: false,
-  },
-  {
-    id: 3,
-    sender: "Unknown Sender",
-    address: "winner@unknown.com",
-    subject: "Congratulations! You have won a prize",
-    preview: "Claim your exclusive reward before it expires.",
-    time: "09:48 AM",
-    status: "Spam",
-    unread: false,
-    starred: false,
-  },
-  {
-    id: 4,
-    sender: "Bank Security",
-    address: "security@bank-alert.com",
-    subject: "Verify your account information",
-    preview: "Your account requires immediate verification.",
-    time: "09:15 AM",
-    status: "Phishing",
-    unread: true,
-    starred: false,
-  },
-  {
-    id: 5,
-    sender: "College Administration",
-    address: "admin@college.edu",
-    subject: "Important notice for students",
-    preview: "Please read the following important announcement.",
-    time: "08:52 AM",
-    status: "Safe",
-    unread: false,
-    starred: false,
-  },
-  {
-    id: 6,
-    sender: "Shopping Updates",
-    address: "orders@shopping.com",
-    subject: "Your order has been shipped",
-    preview: "Your recent order is on its way.",
-    time: "08:31 AM",
-    status: "Safe",
-    unread: false,
-    starred: true,
-  },
-  {
-    id: 7,
-    sender: "Unknown Sender",
-    address: "reward@claim-now.com",
-    subject: "Claim your exclusive reward now",
-    preview: "You have been selected for a special reward.",
-    time: "08:05 AM",
-    status: "Spam",
-    unread: false,
-    starred: false,
-  },
-];
+type Draft = {
+  id: string;
+  recipient: string;
+  subject: string;
+  body: string;
+  updated_at: string;
+};
 
-function StatusIcon({ status }: { status: EmailStatus }) {
-  if (status === "Safe") {
-    return <ShieldCheck size={13} />;
+type InboxProps = {
+  emails: InboxEmail[];
+  loading: boolean;
+  error: string;
+  onRefresh: () => Promise<void>;
+  onOpenEmail: (email: InboxEmail) => Promise<InboxEmail>;
+};
+
+const API_BASE = `https://${window.location.hostname}:5000`;
+const STARRED_KEY = "smartmail_starred_ids";
+const TRASH_KEY = "smartmail_trashed_ids";
+
+function readIds(key: string): string[] {
+  try {
+    const value = JSON.parse(localStorage.getItem(key) || "[]");
+    return Array.isArray(value) ? value.map(String) : [];
+  } catch {
+    return [];
   }
-
-  if (status === "Spam") {
-    return <Ban size={13} />;
-  }
-
-  return <AlertTriangle size={13} />;
 }
 
-function Inbox() {
-  const [emails, setEmails] = useState<Email[]>(initialEmails);
+export default function Inbox({
+  emails,
+  loading,
+  error,
+  onRefresh,
+  onOpenEmail,
+}: InboxProps) {
+  const [folder, setFolder] = useState<MailFolder>("Inbox");
+  const [emailFilter, setEmailFilter] = useState<EmailFilter>("All");
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<"All" | EmailStatus>("All");
-  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
-  const [showFilter, setShowFilter] = useState(false);
+  const [selected, setSelected] = useState<InboxEmail | null>(null);
+  const [starred, setStarred] = useState<string[]>(() => readIds(STARRED_KEY));
+  const [trashed, setTrashed] = useState<string[]>(() => readIds(TRASH_KEY));
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  const [drafts, setDrafts] = useState<Draft[]>([]);
+  const [draftsLoading, setDraftsLoading] = useState(false);
+
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [recipient, setRecipient] = useState("");
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [composeBusy, setComposeBusy] = useState(false);
+  const [composeMessage, setComposeMessage] = useState("");
+  const [composeError, setComposeError] = useState("");
+
+  const loadDrafts = async () => {
+    setDraftsLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE}/api/mail/drafts`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Could not load drafts.");
+      }
+
+      setDrafts(Array.isArray(data.drafts) ? data.drafts : []);
+    } catch (err) {
+      console.error("Draft loading failed:", err);
+    } finally {
+      setDraftsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadDrafts();
+  }, []);
+
+  useEffect(() => {
+    const updateStars = () => setStarred(readIds(STARRED_KEY));
+    const updateTrash = () => setTrashed(readIds(TRASH_KEY));
+
+    window.addEventListener("storage", updateStars);
+    window.addEventListener("smartmail-starred-updated", updateStars);
+    window.addEventListener("smartmail-trash-updated", updateTrash);
+
+    return () => {
+      window.removeEventListener("storage", updateStars);
+      window.removeEventListener("smartmail-starred-updated", updateStars);
+      window.removeEventListener("smartmail-trash-updated", updateTrash);
+    };
+  }, []);
+
+  const openEmail = async (email: InboxEmail) => {
+    setSelected(email);
+    setDetailLoading(true);
+
+    try {
+      const updated = await onOpenEmail(email);
+      setSelected(updated);
+    } catch (err) {
+      console.error("Unable to open email:", err);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const toggleStar = (id: string) => {
+    const next = starred.includes(id)
+      ? starred.filter((item) => item !== id)
+      : [...starred, id];
+
+    setStarred(next);
+    localStorage.setItem(STARRED_KEY, JSON.stringify(next));
+    window.dispatchEvent(new Event("smartmail-starred-updated"));
+  };
+
+  const moveToBin = (id: string) => {
+    const next = [...new Set([...trashed, id])];
+    setTrashed(next);
+    localStorage.setItem(TRASH_KEY, JSON.stringify(next));
+    window.dispatchEvent(new Event("smartmail-trash-updated"));
+    setSelected((current) => current?.id === id ? null : current);
+  };
+
+  const restore = (id: string) => {
+    const next = trashed.filter((item) => item !== id);
+    setTrashed(next);
+    localStorage.setItem(TRASH_KEY, JSON.stringify(next));
+    window.dispatchEvent(new Event("smartmail-trash-updated"));
+  };
+
+  const startCompose = () => {
+    setDraftId(null);
+    setRecipient("");
+    setSubject("");
+    setBody("");
+    setComposeError("");
+    setComposeMessage("");
+    setComposeOpen(true);
+  };
+
+  const editDraft = (draft: Draft) => {
+    setDraftId(draft.id);
+    setRecipient(draft.recipient);
+    setSubject(draft.subject);
+    setBody(draft.body);
+    setComposeError("");
+    setComposeMessage("");
+    setComposeOpen(true);
+  };
+
+  const closeCompose = () => {
+    if (composeBusy) return;
+    setComposeOpen(false);
+    setComposeError("");
+    setComposeMessage("");
+  };
+
+  const saveDraft = async () => {
+    if (!recipient.trim() && !subject.trim() && !body.trim()) {
+      setComposeError("Enter something before saving your draft.");
+      return;
+    }
+
+    setComposeBusy(true);
+    setComposeError("");
+    setComposeMessage("");
+
+    try {
+      const response = await fetch(`${API_BASE}/api/mail/drafts`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: draftId,
+          recipient,
+          subject,
+          body,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Could not save draft.");
+      }
+
+      await loadDrafts();
+      setComposeMessage("Draft saved successfully.");
+      setDraftId(data.draft.id);
+      setFolder("Drafts");
+      setComposeOpen(false);
+    } catch (err) {
+      setComposeError(
+        err instanceof Error ? err.message : "Could not save draft."
+      );
+    } finally {
+      setComposeBusy(false);
+    }
+  };
+
+  const sendEmail = async () => {
+    if (!recipient.trim()) {
+      setComposeError("Please enter a recipient email address.");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient.trim())) {
+      setComposeError("Please enter a valid email address.");
+      return;
+    }
+
+    setComposeBusy(true);
+    setComposeError("");
+    setComposeMessage("");
+
+    try {
+      const response = await fetch(`${API_BASE}/api/mail/send`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recipient: recipient.trim(),
+          subject,
+          body,
+          draft_id: draftId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Email could not be sent.");
+      }
+
+      await loadDrafts();
+      setComposeMessage("Email sent successfully through Gmail.");
+      setComposeOpen(false);
+      setDraftId(null);
+      setRecipient("");
+      setSubject("");
+      setBody("");
+    } catch (err) {
+      setComposeError(
+        err instanceof Error ? err.message : "Email could not be sent."
+      );
+    } finally {
+      setComposeBusy(false);
+    }
+  };
+
+  const deleteDraft = async (id: string) => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/mail/drafts/${encodeURIComponent(id)}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Could not delete draft.");
+      }
+
+      await loadDrafts();
+    } catch (err) {
+      console.error("Draft deletion failed:", err);
+    }
+  };
+
+  const draftEmails: InboxEmail[] = drafts.map((draft) => ({
+    id: draft.id,
+    sender: "Draft",
+    address: draft.recipient || "No recipient",
+    subject: draft.subject || "(No subject)",
+    preview: draft.body.slice(0, 140),
+    time: draft.updated_at
+      ? new Date(draft.updated_at).toLocaleString()
+      : "",
+    status: "Unclassified",
+    body: draft.body,
+  }));
+
+  const folderEmails = useMemo(() => {
+    if (folder === "Drafts") return draftEmails;
+
+    if (folder === "Bin") {
+      return emails.filter((email) => trashed.includes(email.id));
+    }
+
+    const active = emails.filter((email) => !trashed.includes(email.id));
+
+    if (folder === "Starred") {
+      return active.filter((email) => starred.includes(email.id));
+    }
+
+    return active;
+  }, [emails, folder, starred, trashed, drafts]);
 
   const filteredEmails = useMemo(() => {
+    if (emailFilter === "All" || folder !== "Inbox") {
+      return folderEmails;
+    }
+
+    return folderEmails.filter((email) => email.status === emailFilter);
+  }, [folderEmails, emailFilter, folder]);
+
+  const visibleEmails = useMemo(() => {
     const query = search.trim().toLowerCase();
+    if (!query) return filteredEmails;
 
-    return emails.filter((email) => {
-      const matchesFilter =
-        filter === "All" || email.status === filter;
-
-      const matchesSearch =
-        query === "" ||
-        email.sender.toLowerCase().includes(query) ||
-        email.address.toLowerCase().includes(query) ||
-        email.subject.toLowerCase().includes(query) ||
-        email.preview.toLowerCase().includes(query);
-
-      return matchesFilter && matchesSearch;
-    });
-  }, [emails, search, filter]);
-
-  const toggleStar = (id: number) => {
-    setEmails((currentEmails) =>
-      currentEmails.map((email) =>
-        email.id === id
-          ? { ...email, starred: !email.starred }
-          : email
-      )
+    return filteredEmails.filter((email) =>
+      `${email.sender} ${email.address} ${email.subject} ${email.preview}`
+        .toLowerCase()
+        .includes(query)
     );
+  }, [filteredEmails, search]);
+
+  const activeEmails = emails.filter((email) => !trashed.includes(email.id));
+
+  const counts = {
+    inbox: activeEmails.length,
+    starred: activeEmails.filter((email) => starred.includes(email.id)).length,
+    drafts: drafts.length,
+    bin: trashed.length,
   };
 
-  const openEmail = (email: Email) => {
-    setSelectedEmail(email);
+  if (selected) {
+    const selectedStatus = selected.status;
 
-    setEmails((currentEmails) =>
-      currentEmails.map((item) =>
-        item.id === email.id
-          ? { ...item, unread: false }
-          : item
-      )
-    );
-  };
-
-  const refreshInbox = () => {
-    setEmails(initialEmails);
-    setSearch("");
-    setFilter("All");
-    setShowFilter(false);
-    setSelectedEmail(null);
-  };
-
-  if (selectedEmail) {
     return (
-      <main className="inbox-page">
-        <header className="inbox-topbar">
+      <section className="inbox-page">
+        <div className="inbox-topbar">
           <div className="inbox-title-area">
             <button
-              className="inbox-back-btn"
-              onClick={() => setSelectedEmail(null)}
-              title="Back to inbox"
+              className="inbox-icon-btn"
               type="button"
+              onClick={() => setSelected(null)}
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={19} />
             </button>
-
-            <div className="inbox-title-icon">
-              <Mail size={21} />
-            </div>
-
             <div>
-              <h1>Inbox</h1>
-              <p>Email details</p>
+              <h1>Email Details</h1>
+              <p>View your email securely</p>
             </div>
           </div>
+        </div>
 
-          <button
-            className="inbox-icon-btn"
-            onClick={() => setSelectedEmail(null)}
-            title="Close"
-            type="button"
-          >
-            <X size={18} />
-          </button>
-        </header>
-
-        <section className="email-detail-card">
+        <div className="email-detail-card">
           <div className="email-detail-header">
             <div className="detail-avatar">
-              {selectedEmail.sender.charAt(0)}
+              {selected.sender.charAt(0).toUpperCase()}
             </div>
-
             <div className="detail-sender">
-              <h2>{selectedEmail.sender}</h2>
-              <span>{selectedEmail.address}</span>
+              <h2>{selected.sender}</h2>
+              <span>{selected.address}</span>
             </div>
-
-            <span
-              className={`inbox-status ${selectedEmail.status.toLowerCase()}`}
-            >
-              <StatusIcon status={selectedEmail.status} />
-              {selectedEmail.status}
-            </span>
+            <span>{selected.time}</span>
           </div>
 
           <div className="email-detail-content">
-            <h2>{selectedEmail.subject}</h2>
+            <h2>{selected.subject}</h2>
+            <span className={`inbox-status ${selectedStatus.toLowerCase()}`}>
+              {selectedStatus}
+            </span>
+            <div className="detail-divider" />
 
-            <p className="detail-time">
-              Today at {selectedEmail.time}
-            </p>
+            {detailLoading ? (
+              <p>Loading email details...</p>
+            ) : (
+              <div className="detail-body">
+                {selected.body || selected.preview || "No email content available."}
+              </div>
+            )}
 
-            <div className="detail-divider"></div>
+            <div className="detail-divider" />
 
-            <p className="detail-body">
-              {selectedEmail.preview}
-            </p>
+            <div className="inbox-actions">
+              <button
+                className="filter-btn"
+                type="button"
+                onClick={() => toggleStar(selected.id)}
+              >
+                <Star size={16} />
+                {starred.includes(selected.id) ? "Unstar" : "Star"}
+              </button>
 
-            <p className="detail-body">
-              This email has been analyzed by the SmartMail security
-              system. The AI engine checks the message using language
-              detection, NLP analysis, machine-learning
-              classification, and risk scoring.
-            </p>
+              <button
+                className="filter-btn"
+                type="button"
+                onClick={() => moveToBin(selected.id)}
+              >
+                <Trash2 size={16} />
+                Move to Bin
+              </button>
+
+              <button
+                className="filter-btn"
+                type="button"
+                onClick={() => setSelected(null)}
+              >
+                Back
+              </button>
+            </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
     );
   }
 
   return (
-    <main className="inbox-page">
-      <header className="inbox-topbar">
+    <section className="inbox-page">
+      <div className="inbox-topbar">
         <div className="inbox-title-area">
           <div className="inbox-title-icon">
             <Mail size={21} />
           </div>
-
           <div>
             <h1>Inbox</h1>
             <p>All your emails in one secure place</p>
@@ -269,154 +472,188 @@ function Inbox() {
 
         <div className="inbox-actions">
           <button
-            className="inbox-icon-btn"
-            onClick={refreshInbox}
-            title="Refresh inbox"
             type="button"
+            className="smartmail-compose-btn"
+            onClick={startCompose}
           >
-            <RefreshCw size={18} />
+            <Plus size={17} />
+            Compose
           </button>
 
           <button
-            className="inbox-icon-btn"
-            title="More options"
             type="button"
+            className="inbox-icon-btn"
+            onClick={() => void onRefresh()}
+            title="Refresh inbox"
           >
-            <MoreVertical size={18} />
+            <RefreshCw size={17} />
           </button>
         </div>
-      </header>
+      </div>
 
-      <section className="inbox-toolbar">
+      {composeMessage && (
+        <div className="smartmail-compose-success" role="status">
+          {composeMessage}
+        </div>
+      )}
+
+      <div className="inbox-summary">
+        {(["Inbox", "Starred", "Drafts", "Bin"] as MailFolder[]).map((name) => (
+          <button
+            key={name}
+            type="button"
+            className={folder === name ? "filter-option active" : "filter-option"}
+            onClick={() => {
+              setFolder(name);
+              setEmailFilter("All");
+              setSearch("");
+            }}
+          >
+            {name === "Inbox" ? <InboxIcon size={17} /> :
+              name === "Starred" ? <Star size={17} /> :
+              name === "Drafts" ? <FileText size={17} /> :
+              <Trash2 size={17} />}
+            {name}
+            {name === "Inbox" && ` ${counts.inbox}`}
+            {name === "Starred" && ` ${counts.starred}`}
+            {name === "Drafts" && ` ${counts.drafts}`}
+            {name === "Bin" && ` ${counts.bin}`}
+          </button>
+        ))}
+      </div>
+
+      <div className="inbox-connection-status">
+        {error ? (
+          <span>{`Gmail connection error: ${error}`}</span>
+        ) : (
+          <span>
+            Connected to Gmail — showing shared emails and saved classifications.
+          </span>
+        )}
+      </div>
+
+      <div className="inbox-toolbar">
         <div className="inbox-search">
-          <Search size={18} />
-
+          <Search size={17} />
           <input
-            type="text"
+            type="search"
+            placeholder={folder === "Drafts" ? "Search drafts..." : "Search inbox..."}
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search emails..."
           />
-
           {search && (
             <button
-              className="clear-search"
-              onClick={() => setSearch("")}
-              title="Clear search"
               type="button"
+              onClick={() => setSearch("")}
+              aria-label="Clear search"
             >
               <X size={15} />
             </button>
           )}
         </div>
 
-        <div className="filter-wrapper">
-          <button
-            className="filter-btn"
-            onClick={() => setShowFilter((current) => !current)}
-            type="button"
-          >
-            <SlidersHorizontal size={16} />
-            Filter
-            <ChevronDown size={14} />
-          </button>
+        {folder === "Inbox" && (
+          <div className="filter-wrapper">
+            <button
+              className="filter-btn"
+              type="button"
+              onClick={() => setFilterOpen((value) => !value)}
+            >
+              <SlidersHorizontal size={16} />
+              Filter
+              <span>⌄</span>
+            </button>
 
-          {showFilter && (
-            <div className="filter-menu">
-              {(["All", "Safe", "Spam", "Phishing"] as const).map(
-                (option) => (
+            {filterOpen && (
+              <div className="filter-menu">
+                {(["All", "Spam", "Phishing", "Unclassified"] as EmailFilter[]).map((option) => (
                   <button
                     key={option}
-                    className={
-                      filter === option
-                        ? "filter-option active"
-                        : "filter-option"
-                    }
-                    onClick={() => {
-                      setFilter(option);
-                      setShowFilter(false);
-                    }}
                     type="button"
+                    className={emailFilter === option ? "filter-option active" : "filter-option"}
+                    onClick={() => {
+                      setEmailFilter(option);
+                      setFilterOpen(false);
+                    }}
                   >
                     {option}
                   </button>
-                )
-              )}
-            </div>
-          )}
-        </div>
-      </section>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
-      <section className="inbox-summary">
-        <div>
-          <strong>All Mail</strong>
-          <span>
-            {filteredEmails.length}{" "}
-            {filteredEmails.length === 1 ? "email" : "emails"}
-          </span>
-        </div>
+      <div className="inbox-list-heading">
+        <strong>{folder === "Inbox" ? "Inbox" : folder}</strong>
+        <span>
+          {folder === "Drafts" && draftsLoading
+            ? "Loading drafts..."
+            : `${visibleEmails.length} ${folder === "Drafts" ? "drafts" : "emails"}`}
+        </span>
+      </div>
 
-        <div className="inbox-summary-right">
-          <span>
-            <span className="summary-dot safe"></span>
-            Safe
-          </span>
-
-          <span>
-            <span className="summary-dot spam"></span>
-            Spam
-          </span>
-
-          <span>
-            <span className="summary-dot phishing"></span>
-            Phishing
-          </span>
-        </div>
-      </section>
-
-      <section className="inbox-list">
-        {filteredEmails.length === 0 ? (
+      <div className="inbox-list">
+        {visibleEmails.length === 0 ? (
           <div className="empty-inbox">
-            <Search size={28} />
-            <h2>No emails found</h2>
-            <p>Try a different search or filter.</p>
+            {loading || (folder === "Drafts" && draftsLoading) ? (
+              <>
+                <RefreshCw size={28} />
+                <h2>Loading...</h2>
+              </>
+            ) : error && folder === "Inbox" ? (
+              <>
+                <Mail size={28} />
+                <h2>Gmail connection unavailable</h2>
+                <p>Use refresh to try again.</p>
+              </>
+            ) : (
+              <>
+                <InboxIcon size={28} />
+                <h2>
+                  {folder === "Drafts" ? "No drafts available" :
+                    folder === "Bin" ? "Bin is empty" :
+                    folder === "Starred" ? "No starred emails" :
+                    emailFilter === "Spam" ? "No spam emails found" :
+                    emailFilter === "Phishing" ? "No phishing emails found" :
+                    emailFilter === "Unclassified" ? "No unclassified emails" :
+                    "No emails found"}
+                </h2>
+              </>
+            )}
           </div>
         ) : (
-          filteredEmails.map((email) => (
+          visibleEmails.map((email) => (
             <article
-              className={
-                email.unread
-                  ? "inbox-email unread"
-                  : "inbox-email"
-              }
+              className={email.unread ? "inbox-email unread" : "inbox-email"}
               key={email.id}
-              onClick={() => openEmail(email)}
+              onClick={() => {
+                if (folder === "Drafts") {
+                  const draft = drafts.find((item) => item.id === email.id);
+                  if (draft) editDraft(draft);
+                } else {
+                  void openEmail(email);
+                }
+              }}
             >
-              <div
-                className="email-checkbox"
-                onClick={(event) => event.stopPropagation()}
-              >
-                <input type="checkbox" />
+              <div className="email-checkbox" onClick={(event) => event.stopPropagation()}>
+                <input type="checkbox" aria-label={`Select ${email.subject}`} />
               </div>
 
-              <button
-                className={
-                  email.starred
-                    ? "star-btn starred"
-                    : "star-btn"
-                }
-                onClick={(event) => {
-                  event.stopPropagation();
-                  toggleStar(email.id);
-                }}
-                title="Star email"
-                type="button"
-              >
-                <Star
-                  size={18}
-                  fill={email.starred ? "currentColor" : "none"}
-                />
-              </button>
+              {folder !== "Drafts" && (
+                <button
+                  className={starred.includes(email.id) ? "star-btn starred" : "star-btn"}
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    toggleStar(email.id);
+                  }}
+                  title="Star email"
+                >
+                  <Star size={17} fill={starred.includes(email.id) ? "currentColor" : "none"} />
+                </button>
+              )}
 
               <div className="inbox-sender">
                 <strong>{email.sender}</strong>
@@ -428,45 +665,167 @@ function Inbox() {
                 <span> — {email.preview}</span>
               </div>
 
-              <div
-                className={`inbox-status ${email.status.toLowerCase()}`}
-              >
-                <StatusIcon status={email.status} />
-                {email.status}
-              </div>
+              {folder === "Drafts" ? (
+                <span className="inbox-status">
+                  <FileText size={12} />
+                  Draft
+                </span>
+              ) : (
+                <>
+                  <span className={`inbox-status ${email.status.toLowerCase()}`}>
+                    {email.status === "Safe" ? <ShieldCheck size={12} /> :
+                      email.status === "Phishing" ? <ShieldAlert size={12} /> :
+                      email.status === "Spam" ? <AlertTriangle size={12} /> : null}
+                    {email.status}
+                  </span>
+
+                  <span className="inbox-status">
+                    <Mail size={12} />
+                    {email.unread ? "Unread" : "Read"}
+                  </span>
+                </>
+              )}
 
               <span className="inbox-time">{email.time}</span>
 
-              <button
-                className="email-more-btn"
-                onClick={(event) => event.stopPropagation()}
-                title="Email options"
-                type="button"
-              >
-                <MoreVertical size={17} />
-              </button>
+              {folder === "Drafts" ? (
+                <button
+                  className="email-more-btn"
+                  type="button"
+                  title="Delete draft"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    void deleteDraft(email.id);
+                  }}
+                >
+                  <Trash2 size={16} />
+                </button>
+              ) : folder === "Bin" ? (
+                <button
+                  className="email-more-btn"
+                  type="button"
+                  title="Restore email"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    restore(email.id);
+                  }}
+                >
+                  <RotateCcw size={16} />
+                </button>
+              ) : (
+                <button
+                  className="email-more-btn"
+                  type="button"
+                  title="Move to Bin"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    moveToBin(email.id);
+                  }}
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
             </article>
           ))
         )}
-      </section>
+      </div>
 
-      <footer className="inbox-footer">
-        <span>
-          Showing {filteredEmails.length} of {emails.length} emails
-        </span>
+      <div className="inbox-footer">
+        Showing {visibleEmails.length} of {filteredEmails.length} emails
+      </div>
 
-        {filter !== "All" && (
-          <button
-            className="clear-filter-btn"
-            onClick={() => setFilter("All")}
-            type="button"
+      {composeOpen && (
+        <div className="smartmail-compose-overlay">
+          <div
+            className="smartmail-compose-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="compose-heading"
           >
-            Clear filter
-          </button>
-        )}
-      </footer>
-    </main>
+            <div className="smartmail-compose-header">
+              <div>
+                <h2 id="compose-heading">
+                  {draftId ? "Edit Draft" : "New Message"}
+                </h2>
+                <p>Compose an email using your connected Gmail account</p>
+              </div>
+
+              <button
+                type="button"
+                className="inbox-icon-btn"
+                onClick={closeCompose}
+                disabled={composeBusy}
+                aria-label="Close compose window"
+              >
+                <X size={19} />
+              </button>
+            </div>
+
+            <div className="smartmail-compose-fields">
+              <label>
+                To
+                <input
+                  type="email"
+                  placeholder="recipient@example.com"
+                  value={recipient}
+                  onChange={(event) => setRecipient(event.target.value)}
+                  disabled={composeBusy}
+                />
+              </label>
+
+              <label>
+                Subject
+                <input
+                  type="text"
+                  placeholder="Email subject"
+                  value={subject}
+                  onChange={(event) => setSubject(event.target.value)}
+                  disabled={composeBusy}
+                />
+              </label>
+
+              <label>
+                Message
+                <textarea
+                  placeholder="Write your message..."
+                  value={body}
+                  onChange={(event) => setBody(event.target.value)}
+                  rows={10}
+                  disabled={composeBusy}
+                />
+              </label>
+            </div>
+
+            {composeError && (
+              <p className="smartmail-compose-error" role="alert">
+                {composeError}
+              </p>
+            )}
+
+            <div className="smartmail-compose-footer">
+              <button
+                type="button"
+                className="filter-btn"
+                onClick={() => void saveDraft()}
+                disabled={composeBusy}
+              >
+                {composeBusy ? <LoaderCircle size={16} /> : <Save size={16} />}
+                Save Draft
+              </button>
+
+              <button
+                type="button"
+                className="smartmail-compose-send"
+                onClick={() => void sendEmail()}
+                disabled={composeBusy}
+              >
+                {composeBusy ? <LoaderCircle size={16} /> : <Send size={16} />}
+                Send Email
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
-
-export default Inbox;

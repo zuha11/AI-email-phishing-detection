@@ -1,39 +1,40 @@
-# Logs
-logs
+# Dependencies and build output
+node_modules/
+dist/
+dist-ssr/
+
+# Logs and local files
+logs/
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
 *.local
+.DS_Store
 
-# Editor directories and files
+# Editor files
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.idea/
 
+# Python cache
 __pycache__/
 *.pyc
 *.bak
 
-# Private credentials
+# Private credentials and certificates
 .env
 .env.*
 !.env.example
+.flask_session_secret
+localhost+1.pem
+localhost+1-key.pem
 
-# Python and ML temporary files
-__pycache__/
-*.pyc
+# Private databases and email data
+*.sqlite3
+gmail_emails.csv
+poc6_flooding_report.local-backup.json
 
-src/pages/live_gmail_poc4_check.json
+# Local backups
+*.backup*
+app_before*.py
+app_broken*.py
+app_short_backup.py
+app_code_backup.txt
